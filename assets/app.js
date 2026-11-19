@@ -106,7 +106,9 @@
     body.hidden = false; if (paywall) paywall.hidden = true;
   }
   async function unlocked(name){
-    document.querySelectorAll(".lock").forEach(el => el.hidden = true);
+    document.documentElement.classList.add("is-member");
+    document.querySelectorAll(".lock, .sub-banner").forEach(el => el.hidden = true);
+    document.querySelectorAll(".access").forEach(el => { if (el.textContent.includes("🔒")) el.textContent = "✓ Підписка активна: усі рецепти розділу відкриті"; });
     if (body){
       const { status, data } = await api("/api/recipe/" + body.dataset.no);
       if (status === 200) { renderRecipe(data); return; }

@@ -1,3 +1,6 @@
+/* Атрибут hidden завжди ховає елемент, навіть якщо в класу є display:grid/flex */
+[hidden]{display:none!important}
+.is-member .lock{display:none!important}
 /* Layout: сайт-книга — липка шапка з розділами, головна з плитками розділів, сторінка розділу з сіткою карток, окрема сторінка рецепта */
 :root{
   --bg:#F4F5F1; --surface:#FFFFFF; --ink:#18211B; --muted:#5E6B61; --line:#DDE1D9;
