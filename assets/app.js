@@ -108,6 +108,8 @@
   async function unlocked(name){
     document.documentElement.classList.add("is-member");
     document.querySelectorAll(".lock, .sub-banner").forEach(el => el.hidden = true);
+    document.querySelectorAll("[data-after-login]").forEach(el => { el.hidden = false; });
+    if (document.querySelector("[data-after-login]")) { boxes.forEach(b => b.closest(".pw-login") && (b.closest(".pw-login").hidden = true)); return; }
     document.querySelectorAll(".access").forEach(el => { if (el.textContent.includes("🔒")) el.textContent = "✓ Підписка активна: усі рецепти розділу відкриті"; });
     if (body){
       const { status, data } = await api("/api/recipe/" + body.dataset.no);
