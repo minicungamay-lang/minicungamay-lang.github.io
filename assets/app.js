@@ -45,7 +45,7 @@
         ${r.p ? `<div class="pic"><img src="${root}photos/${pad(r.no)}.jpg" alt="${esc(r.n)}" loading="lazy"></div>`
               : `<div class="pic empty" aria-hidden="true"><div class="plate"><span>№ ${pad(r.no)}</span></div><small>фото готується</small></div>`}
         <div class="body"><div class="no"><span>${r.cn} · № ${pad(r.no)}</span><span class="star" hidden>★</span></div>
-        <h3>${esc(r.n)}</h3><div class="meta"><span>⏱ ${fmtTime(r.m)}</span><span>${esc(fmtServ(r.s))}</span></div></div></a>`;
+        <h3>${esc(r.n)}</h3><div class="meta"><span>⏱ ${fmtTime(r.m)}</span><span>${esc(fmtServ(r.s))}</span><span>${r.k} ккал</span></div></div></a>`;
       let list, empty;
       if (holder.dataset.list === "favorites"){
         list = data.filter(r => favs.has(r.no));

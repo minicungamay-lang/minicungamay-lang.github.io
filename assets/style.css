@@ -156,3 +156,14 @@ h2.sec{font-family:var(--display);font-weight:700;font-size:clamp(20px,3vw,28px)
 @media (max-width:980px){.index{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:620px){.index{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .site-foot a{color:var(--muted)}
+.nutri{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:18px;display:grid;gap:10px}
+.nutri-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.nutri-head b{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--c)}
+.nutri-head span{font-size:12px;color:var(--muted)}
+.nutri-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.nutri .n{display:grid;gap:2px}
+.nutri .n b{font-family:var(--mono);font-size:18px;font-variant-numeric:tabular-nums}
+.nutri .n.kcal b{color:var(--c)}
+.nutri .n span{font-size:12px;color:var(--muted)}
+.nutri small{font-size:11.5px;color:var(--muted);line-height:1.45}
+@media (max-width:420px){.nutri .n b{font-size:16px}}
