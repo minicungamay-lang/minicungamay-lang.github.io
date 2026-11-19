@@ -22,7 +22,7 @@
 <link rel="stylesheet" href="../assets/style.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Recipe","name":"Журавлинний соус","author":{"@type":"Person","name":"Артем Трачук"},"inLanguage":"uk","recipeCategory":"Соуси","recipeCuisine":"Домашня кухня","totalTime":"PT15M","recipeYield":"≈300 мл","description":"Журавлинний соус: домашній рецепт від Артема Трачука.","nutrition":{"@type":"NutritionInformation","servingSize":"на 2 ст. л. (30 г)","calories":"26 ккал","proteinContent":"0 г","fatContent":"0 г","carbohydrateContent":"6 г"},"url":"https://minicungamay-lang.github.io/sousy/zhuravlynnyi-sous.html","isAccessibleForFree":false}</script>
 </head>
-<body data-root="../">
+<body data-root="../" data-api="https://trachuk-recipes-api.trachuk.workers.dev" data-bot="trachuk_recipes_bot">
 <header class="site-head gut">
   <div class="wrap head-row">
     <a class="brand" href="../"><b>100</b><span>рецептів Артема Трачука</span></a>
@@ -75,8 +75,10 @@
       <li>КБЖВ і нові рецепти щотижня</li>
     </ul>
     <div class="pw-actions"><a class="btn" href="https://t.me/+mtOTeZuYtBExMjA6" target="_blank" rel="noopener">Підписатися за 150 грн/міс</a><a class="btn ghost" href="../pidpyska.html">Що входить у підписку</a></div>
+    <div class="pw-login"><b>Вже підписані?</b> Увійдіть через Telegram, і рецепт відкриється тут.<div data-login></div></div>
     <small>Безкоштовно: усі рецепти розділу <a href="../snidanky/">«Сніданки»</a>.</small>
   </section>
+  <section class="recipe-body" data-locked-body data-no="100" hidden></section>
   </article>
   <nav class="pager">
     <a href="../sousy/svizha-adzhyka.html" style="--c:var(--c-sauces)"><small>← Попередній · Соуси</small><b>Свіжа аджика</b></a>
