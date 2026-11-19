@@ -64,3 +64,72 @@
   }
   paintFavs();
 })();
+
+// ---------- вхід через Telegram і доступ підписників ----------
+(function(){
+  const API = document.body.dataset.api, BOT = document.body.dataset.bot;
+  if (!API || !BOT) return;
+  const KEY = "rb-session";
+  const get = () => { try { return localStorage.getItem(KEY); } catch(e) { return null; } };
+  const set = t => { try { t ? localStorage.setItem(KEY, t) : localStorage.removeItem(KEY); } catch(e) {} };
+  const esc = s => String(s).replace(/[&<>"]/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+  const boxes = [...document.querySelectorAll("[data-login]")];
+  const body = document.querySelector("[data-locked-body]");
+  const paywall = document.querySelector(".paywall");
+
+  function say(html){ boxes.forEach(b => { let p = b.querySelector(".login-msg"); if (!p) { p = document.createElement("p"); p.className = "login-msg"; b.prepend(p); } p.innerHTML = html; }); }
+  function widget(){
+    boxes.forEach(b => {
+      if (b.querySelector("script,iframe")) return;
+      const s = document.createElement("script");
+      s.async = true; s.src = "https://telegram.org/js/telegram-widget.js?22";
+      s.setAttribute("data-telegram-login", BOT); s.setAttribute("data-size", "large");
+      s.setAttribute("data-radius", "20"); s.setAttribute("data-onauth", "onTelegramAuth(user)");
+      b.appendChild(s);
+    });
+  }
+  function logoutLink(name){ return ` <button type="button" class="linkbtn" data-logout>Вийти${name ? " (" + esc(name) + ")" : ""}</button>`; }
+  document.addEventListener("click", e => { if (e.target.closest("[data-logout]")) { set(null); location.reload(); } });
+
+  async function api(path, opts = {}){
+    const t = get();
+    const r = await fetch(API + path, { ...opts, headers: { ...(opts.headers || {}), ...(t ? { Authorization: "Bearer " + t } : {}) } });
+    return { status: r.status, data: await r.json().catch(() => ({})) };
+  }
+  function renderRecipe(r){
+    body.innerHTML = `<div class="panel"><h2><span>Інгредієнти</span><span data-left>${r.ing.length}</span></h2>
+      <ul class="ing">${r.ing.map(s => `<li><label><input type="checkbox"><span>${esc(s)}</span></label></li>`).join("")}</ul></div>
+      <div class="panel"><h2><span>Приготування</span><span>${r.steps.length} ${r.steps.length < 5 ? "кроки" : "кроків"}</span></h2>
+      <ol class="steps">${r.steps.map(s => `<li><span>${esc(s)}</span></li>`).join("")}</ol></div>`;
+    const bx = [...body.querySelectorAll(".ing input")], left = body.querySelector("[data-left]");
+    bx.forEach(b => b.addEventListener("change", () => { const k = bx.filter(x => !x.checked).length; left.textContent = k ? k : "✓ усе готово"; }));
+    body.hidden = false; if (paywall) paywall.hidden = true;
+  }
+  async function unlocked(name){
+    document.querySelectorAll(".lock").forEach(el => el.hidden = true);
+    if (body){
+      const { status, data } = await api("/api/recipe/" + body.dataset.no);
+      if (status === 200) { renderRecipe(data); return; }
+    }
+    say(`✓ Підписка активна. Відкрийте будь-який закритий рецепт.${logoutLink(name)}`);
+  }
+  window.onTelegramAuth = async user => {
+    say("Перевіряю підписку…");
+    try {
+      const { status, data } = await api("/api/auth", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(user) });
+      if (status !== 200) { say("Не вдалося увійти. Спробуйте ще раз."); return; }
+      set(data.token);
+      if (data.member) unlocked(data.name);
+      else say(`${esc(data.name)}, підписки поки немає. Оформіть її в Telegram і поверніться — рецепти відкриються автоматично.${logoutLink()}`);
+    } catch(e) { say("Немає з’єднання з сервером. Спробуйте пізніше."); }
+  };
+  (async () => {
+    if (!get()) { widget(); return; }
+    try {
+      const { status, data } = await api("/api/me");
+      if (status === 200 && data.member) { unlocked(data.name); return; }
+      if (status === 200) { say(`${esc(data.name)}, підписки поки немає або вона закінчилась.${logoutLink()}`); return; }
+      set(null); widget();
+    } catch(e) { widget(); }
+  })();
+})();
