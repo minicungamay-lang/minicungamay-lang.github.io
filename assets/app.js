@@ -53,8 +53,11 @@
       } else {
         const q = (new URLSearchParams(location.search).get("q") || "").trim();
         document.querySelectorAll('input[name="q"]').forEach(i => i.value = q);
-        const ql = q.toLowerCase();
-        list = q ? data.filter(r => (r.n + " " + r.i).toLowerCase().includes(ql)) : [];
+        // кожне слово запиту шукаємо за основою: «курка» знайде «курячого», «гарбуз» — «гарбуза»
+        const stem = w => w.length >= 6 ? w.slice(0, -2) : w.length >= 4 ? w.slice(0, -1) : w;
+        const SYN = { "курк": ["куряч"], "куряч": ["курк"], "кур": ["курк", "куряч"], "яйц": ["яєць", "яєч"], "яєць": ["яйц"], "індичк": ["індич"], "індич": ["індичк"], "картопл": ["картопл"], "сметан": ["йогурт"] };
+        const words = q.toLowerCase().replace(/[’']/g, "").split(/[\s,]+/).filter(Boolean).map(stem).map(w => [w, ...(SYN[w] || [])]);
+        list = words.length ? data.filter(r => { const hay = (r.n + " " + r.i).toLowerCase().replace(/[’']/g, ""); return words.every(vs => vs.some(v => hay.includes(v))); }) : [];
         document.querySelector("[data-search-title]").textContent = q ? `«${q}»: знайдено ${list.length}` : "Пошук рецептів";
         empty = q ? "Нічого не знайдено. Спробуйте назву страви або продукт, наприклад «гарбуз» чи «курка»." : "Введіть назву страви або інгредієнт у поле пошуку вгорі.";
       }
