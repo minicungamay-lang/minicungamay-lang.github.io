@@ -239,3 +239,10 @@ h2.sec{font-family:var(--display);font-weight:700;font-size:clamp(20px,3vw,28px)
   -webkit-mask-image:radial-gradient(ellipse 60% 62% at 50% 42%,#000 35%,transparent 78%);
           mask-image:radial-gradient(ellipse 60% 62% at 50% 42%,#000 35%,transparent 78%)}
 @media (max-width:760px){.hero-me{left:auto;right:-110px;top:70px;width:112%;opacity:.16}}
+
+/* Підказка «Telegram не відкрився» у вбудованих браузерах */
+.tg-hint{position:fixed;left:12px;right:12px;bottom:12px;z-index:100;background:#18211B;color:#fff;max-width:520px;margin:0 auto;border-radius:16px;padding:16px 18px;box-shadow:0 12px 40px rgba(0,0,0,.3);font-size:15px;line-height:1.45}
+.tg-hint p{margin:6px 0 12px;color:#dfe6e0}
+.tg-hint-actions{display:flex;gap:8px;flex-wrap:wrap}
+.tg-hint button{font:inherit;font-weight:600;border:0;border-radius:999px;padding:9px 16px;cursor:pointer;background:#fff;color:#18211B}
+.tg-hint button[data-close]{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4)}

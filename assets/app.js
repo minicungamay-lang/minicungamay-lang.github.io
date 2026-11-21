@@ -150,3 +150,46 @@
     } catch(e) { widget(); }
   })();
 })();
+
+// Кнопки підписки: на телефоні відкриваємо застосунок Telegram напряму, без проміжної сторінки t.me
+(function(){
+  const ua = navigator.userAgent || "";
+  const isAndroid = /Android/i.test(ua), isIOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  const inApp = /Instagram|FBAN|FBAV|FB_IAB|FBIOS|TikTok|musical_ly|BytedanceWebview|Line\/|Snapchat|Threads|Twitter/i.test(ua);
+  const subLinks = () => document.querySelectorAll('a[href^="https://t.me/+"]');
+
+  // Підказка для вбудованих браузерів соцмереж: вони часто не пускають у застосунок Telegram
+  function inAppHint(link){
+    if (document.querySelector(".tg-hint")) return;
+    const box = document.createElement("div");
+    box.className = "tg-hint"; box.setAttribute("role", "dialog");
+    box.innerHTML = `<b>Telegram не відкрився?</b>
+      <p>Ви переглядаєте сайт усередині ${/Instagram/i.test(ua) ? "Instagram" : /TikTok|musical_ly|Bytedance/i.test(ua) ? "TikTok" : "соцмережі"}. Натисніть <b>⋯</b> угорі праворуч → <b>«Відкрити в браузері»</b>, і кнопка підписки спрацює.</p>
+      <div class="tg-hint-actions"><button type="button" data-copy>Скопіювати посилання</button><button type="button" data-close>Закрити</button></div>`;
+    document.body.appendChild(box);
+    box.querySelector("[data-close]").onclick = () => box.remove();
+    box.querySelector("[data-copy]").onclick = async e => {
+      try { await navigator.clipboard.writeText(link); e.target.textContent = "Скопійовано ✓"; }
+      catch(err) { prompt("Скопіюйте посилання і відкрийте в Telegram:", link); }
+    };
+  }
+
+  document.addEventListener("click", e => {
+    const a = e.target.closest && e.target.closest('a[href^="https://t.me/+"]');
+    if (!a || !(isAndroid || isIOS)) return;          // на комп'ютері сторінка t.me працює як треба
+    const href = a.href, code = href.split("/+")[1];
+    if (!code) return;
+    e.preventDefault();
+    if (isAndroid) {
+      location.href = `intent://join?invite=${code}#Intent;scheme=tg;S.browser_fallback_url=${encodeURIComponent(href)};end`;
+    } else {
+      location.href = `tg://join?invite=${code}`;
+      // якщо застосунок не відкрився (немає Telegram або браузер заблокував) — відкриваємо звичайне посилання
+      setTimeout(() => { if (!document.hidden) location.href = href; }, 1600);
+    }
+    if (inApp) setTimeout(() => { if (!document.hidden) inAppHint(href); }, 2200);
+  });
+
+  // У вбудованих браузерах прибираємо відкриття в новій вкладці: вони його часто ігнорують
+  if (inApp) subLinks().forEach(a => a.removeAttribute("target"));
+})();
