@@ -211,9 +211,8 @@ h2.sec{font-family:var(--display);font-weight:700;font-size:clamp(20px,3vw,28px)
 .after-login p{margin:0 0 12px}
 
 /* КБЖВ: уся страва і розбивка по інгредієнтах */
-.nutri-total{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;padding-top:8px;border-top:1px dashed var(--line);font-size:13px}
-.nutri-total span{color:var(--muted)}
-.nutri-total b{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums}
+.nutri-total{margin:0;padding-top:10px;border-top:1px dashed var(--line);font-size:14px;line-height:1.5}
+.nutri-total b{font-weight:700;color:var(--c)}
 .parts{grid-column:1/-1;margin:18px 0 24px;min-width:0;max-width:100%}
 .recipe-body+.parts{margin-top:0}
 .parts-scroll{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
