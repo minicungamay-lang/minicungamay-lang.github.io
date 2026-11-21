@@ -209,3 +209,18 @@ h2.sec{font-family:var(--display);font-weight:700;font-size:clamp(20px,3vw,28px)
 .after-login{background:var(--soft);border-radius:var(--radius);padding:18px 20px;margin-top:10px}
 .after-login h2.sec{margin:0 0 6px}
 .after-login p{margin:0 0 12px}
+
+/* КБЖВ: уся страва і розбивка по інгредієнтах */
+.nutri-total{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;padding-top:8px;border-top:1px dashed var(--line);font-size:13px}
+.nutri-total span{color:var(--muted)}
+.nutri-total b{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums}
+.parts{grid-column:1/-1;margin:18px 0 24px;min-width:0;max-width:100%}
+.recipe-body+.parts{margin-top:0}
+.parts-scroll{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+.parts table{width:100%;border-collapse:collapse;font-size:14px;min-width:420px}
+.parts th,.parts td{padding:7px 8px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.parts th:first-child,.parts td:first-child{text-align:left}
+.parts th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.parts td:nth-child(n+2){font-family:var(--mono);font-size:13px}
+.parts tfoot td{font-weight:700;border-bottom:none;background:var(--surface)}
+.parts tfoot tr:first-child td{border-top:2px solid var(--c)}

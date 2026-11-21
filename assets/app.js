@@ -99,11 +99,21 @@
     const r = await fetch(API + path, { ...opts, headers: { ...(opts.headers || {}), ...(t ? { Authorization: "Bearer " + t } : {}) } });
     return { status: r.status, data: await r.json().catch(() => ({})) };
   }
+  const f1 = v => String(v).replace(".", ",");
+  function partsTable(nu){
+    if (!nu) return "";
+    const row = (a, b) => `<tr><td>${esc(a)}</td><td></td>${b.map(v => `<td>${v}</td>`).join("")}</tr>`;
+    const lab = nu.serv[0];
+    return `<section class="parts panel"><h2><span>КБЖВ по інгредієнтах</span><span>уся страва</span></h2>
+      <div class="parts-scroll"><table><thead><tr><th>Продукт</th><th>г</th><th>ккал</th><th>Б</th><th>Ж</th><th>В</th></tr></thead><tbody>
+      ${nu.parts.map(x => `<tr><td>${esc(x[0])}</td><td>${x[1]}</td><td>${x[2]}</td><td>${f1(x[3])}</td><td>${f1(x[4])}</td><td>${f1(x[5])}</td></tr>`).join("")}
+      </tbody><tfoot>${row("Разом · " + nu.w + " г", nu.total)}${row("На 100 г", nu.per100)}${row(lab[0].toUpperCase() + lab.slice(1), nu.serv.slice(1))}</tfoot></table></div></section>`;
+  }
   function renderRecipe(r){
     body.innerHTML = `<div class="panel"><h2><span>Інгредієнти</span><span data-left>${r.ing.length}</span></h2>
       <ul class="ing">${r.ing.map(s => `<li><label><input type="checkbox"><span>${esc(s)}</span></label></li>`).join("")}</ul></div>
       <div class="panel"><h2><span>Приготування</span><span>${r.steps.length} ${r.steps.length < 5 ? "кроки" : "кроків"}</span></h2>
-      <ol class="steps">${r.steps.map(s => `<li><span>${esc(s)}</span></li>`).join("")}</ol></div>`;
+      <ol class="steps">${r.steps.map(s => `<li><span>${esc(s)}</span></li>`).join("")}</ol></div>` + partsTable(r.nu);
     const bx = [...body.querySelectorAll(".ing input")], left = body.querySelector("[data-left]");
     bx.forEach(b => b.addEventListener("change", () => { const k = bx.filter(x => !x.checked).length; left.textContent = k ? k : "✓ усе готово"; }));
     body.hidden = false; if (paywall) paywall.hidden = true;
