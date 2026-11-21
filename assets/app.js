@@ -156,7 +156,7 @@
   const ua = navigator.userAgent || "";
   const isAndroid = /Android/i.test(ua), isIOS = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   const inApp = /Instagram|FBAN|FBAV|FB_IAB|FBIOS|TikTok|musical_ly|BytedanceWebview|Line\/|Snapchat|Threads|Twitter/i.test(ua);
-  const subLinks = () => document.querySelectorAll('a[href^="https://t.me/+"]');
+  const subLinks = () => document.querySelectorAll('a[href^="https://t.me/"]');
 
   // Підказка для вбудованих браузерів соцмереж: вони часто не пускають у застосунок Telegram
   function inAppHint(link){
@@ -175,16 +175,20 @@
   }
 
   document.addEventListener("click", e => {
-    const a = e.target.closest && e.target.closest('a[href^="https://t.me/+"]');
+    const a = e.target.closest && e.target.closest('a[href^="https://t.me/"]');
     if (!a) return;
-    const href = a.href, code = href.split("/+")[1];
-    if (!code) return;
+    const href = a.href, u = new URL(href);
+    // t.me/+КОД → вступ у канал; t.me/бот?start=X → відкрити бота з параметром
+    const code = u.pathname.startsWith("/+") ? u.pathname.slice(2) : "";
+    const bot = code ? "" : u.pathname.slice(1).split("/")[0];
+    if (!code && !bot) return;
+    const tgPath = code ? `join?invite=${code}` : `resolve?domain=${bot}${u.searchParams.get("start") ? "&start=" + encodeURIComponent(u.searchParams.get("start")) : ""}`;
     e.preventDefault();
-    if (!(isAndroid || isIOS)) { desktopDialog(href, code); return; }
+    if (!(isAndroid || isIOS)) { desktopDialog(href, tgPath); return; }
     if (isAndroid) {
-      location.href = `intent://join?invite=${code}#Intent;scheme=tg;S.browser_fallback_url=${encodeURIComponent(href)};end`;
+      location.href = `intent://${tgPath}#Intent;scheme=tg;S.browser_fallback_url=${encodeURIComponent(href)};end`;
     } else {
-      location.href = `tg://join?invite=${code}`;
+      location.href = `tg://${tgPath}`;
       // якщо застосунок не відкрився (немає Telegram або браузер заблокував) — відкриваємо звичайне посилання
       setTimeout(() => { if (!document.hidden) location.href = href; }, 1600);
     }
@@ -193,7 +197,7 @@
 
   // Комп'ютер: кнопка «Join Channel» на t.me працює лише з встановленим Telegram Desktop,
   // тому показуємо вибір: QR-код для телефона, застосунок на комп'ютері, завантаження Telegram
-  function desktopDialog(href, code){
+  function desktopDialog(href, tgPath){
     document.querySelector(".tg-modal")?.remove();
     const m = document.createElement("div");
     m.className = "tg-modal"; m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true");
@@ -203,9 +207,9 @@
       <div class="tg-grid">
         <div class="tg-qr-wrap"><div class="tg-qr" data-qr></div><small>Наведіть камеру телефона</small></div>
         <div class="tg-steps">
-          <p><b>Найпростіше — з телефона.</b> Відскануйте код камерою: відкриється Telegram з оплатою підписки.</p>
+          <p><b>Найпростіше — з телефона.</b> Відскануйте код камерою: відкриється Telegram-бот з номером картки для оплати.</p>
           <p><b>Або на цьому комп'ютері</b>, якщо встановлено Telegram Desktop:</p>
-          <a class="btn" href="tg://join?invite=${code}">Відкрити Telegram</a>
+          <a class="btn" href="tg://${tgPath}">Відкрити Telegram</a>
           <p class="tg-small">Немає Telegram на комп'ютері? <a href="https://desktop.telegram.org/" target="_blank" rel="noopener">Завантажити Telegram Desktop</a> · <button type="button" class="tg-link" data-copy>скопіювати посилання</button></p>
         </div>
       </div></div>`;
