@@ -176,10 +176,11 @@
 
   document.addEventListener("click", e => {
     const a = e.target.closest && e.target.closest('a[href^="https://t.me/+"]');
-    if (!a || !(isAndroid || isIOS)) return;          // на комп'ютері сторінка t.me працює як треба
+    if (!a) return;
     const href = a.href, code = href.split("/+")[1];
     if (!code) return;
     e.preventDefault();
+    if (!(isAndroid || isIOS)) { desktopDialog(href, code); return; }
     if (isAndroid) {
       location.href = `intent://join?invite=${code}#Intent;scheme=tg;S.browser_fallback_url=${encodeURIComponent(href)};end`;
     } else {
@@ -189,6 +190,45 @@
     }
     if (inApp) setTimeout(() => { if (!document.hidden) inAppHint(href); }, 2200);
   });
+
+  // Комп'ютер: кнопка «Join Channel» на t.me працює лише з встановленим Telegram Desktop,
+  // тому показуємо вибір: QR-код для телефона, застосунок на комп'ютері, завантаження Telegram
+  function desktopDialog(href, code){
+    document.querySelector(".tg-modal")?.remove();
+    const m = document.createElement("div");
+    m.className = "tg-modal"; m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true");
+    m.innerHTML = `<div class="tg-card">
+      <button type="button" class="tg-x" aria-label="Закрити">×</button>
+      <h3>Оформлення підписки</h3>
+      <div class="tg-grid">
+        <div class="tg-qr-wrap"><div class="tg-qr" data-qr></div><small>Наведіть камеру телефона</small></div>
+        <div class="tg-steps">
+          <p><b>Найпростіше — з телефона.</b> Відскануйте код камерою: відкриється Telegram з оплатою підписки.</p>
+          <p><b>Або на цьому комп'ютері</b>, якщо встановлено Telegram Desktop:</p>
+          <a class="btn" href="tg://join?invite=${code}">Відкрити Telegram</a>
+          <p class="tg-small">Немає Telegram на комп'ютері? <a href="https://desktop.telegram.org/" target="_blank" rel="noopener">Завантажити Telegram Desktop</a> · <button type="button" class="tg-link" data-copy>скопіювати посилання</button></p>
+        </div>
+      </div></div>`;
+    document.body.appendChild(m);
+    const close = () => { m.remove(); document.removeEventListener("keydown", onKey); };
+    const onKey = ev => { if (ev.key === "Escape") close(); };
+    document.addEventListener("keydown", onKey);
+    m.addEventListener("click", ev => { if (ev.target === m || ev.target.closest(".tg-x")) close(); });
+    m.querySelector("[data-copy]").onclick = async ev => {
+      try { await navigator.clipboard.writeText(href); ev.target.textContent = "скопійовано ✓"; }
+      catch(err) { prompt("Посилання на підписку:", href); }
+    };
+    const box = m.querySelector("[data-qr]");
+    const draw = () => { box.innerHTML = ""; new QRCode(box, { text: href, width: 168, height: 168, colorDark: "#18211B", colorLight: "#FFFFFF", correctLevel: QRCode.CorrectLevel.M }); };
+    if (window.QRCode) draw();
+    else {
+      const sc = document.createElement("script");
+      sc.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+      sc.onload = draw;
+      sc.onerror = () => { box.innerHTML = `<a href="${href}" target="_blank" rel="noopener">${href.replace("https://","")}</a>`; };
+      document.head.appendChild(sc);
+    }
+  }
 
   // У вбудованих браузерах прибираємо відкриття в новій вкладці: вони його часто ігнорують
   if (inApp) subLinks().forEach(a => a.removeAttribute("target"));
